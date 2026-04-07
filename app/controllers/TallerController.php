@@ -41,12 +41,29 @@ class TallerController
     public function solicitar()
     {
         if (!isset($_SESSION['id'])) {
-            echo json_encode(['success' => false, 'error' => 'Debes iniciar sesión']);
+            echo json_encode(['success' => false, 'error' => 'Sesion no iniciada']);
             return;
         }
         
         $tallerId = $_POST['taller_id'] ?? 0;
         $usuarioId = $_SESSION['id'];
 
+        $taller = $this->tallerModel->getById($tallerId);
+
+        if ($taller['cupo_disponible'] <= 0) {
+            echo json_encode(['success' => false, 'error' => 'Taller sin cupos disponibles']);
+            return;
+        }
+
+        if ($this->solicitudModel->existe($tallerId, $usuarioId)) {
+            echo json_encode(['success' => false, 'error' => 'No se puede solicitar el mismo taller 2 veces']);
+            return;
+        }
+
+        if ($this->solicitudModel->crear($tallerId, $usuarioId)) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'No se pudo registrar la solicitud']);
+        }
     }
 }

@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Solicitudes pendientes</title>
-    <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="public/css/style.css">
     <script src="public/js/jquery-4.0.0.min.js"></script>
-    
+    <script src="public/js/solicitud.js"></script>
 </head>
 <body>
     <nav>
@@ -16,7 +16,7 @@
         </div>
         <div>
             <span>Admin: <?= htmlspecialchars($_SESSION['nombre'] ?? $_SESSION['user'] ?? 'Administrador') ?></span>
-            <button id="btnLogout" class="btn-logout">Cerrar sesión</button>
+            <a href="index.php?page=logout" class="btn btn-primary">Cerrar sesión</a>
         </div>
     </nav>
     
@@ -46,6 +46,5 @@
 
     <div id="mensaje"></div>
 
-    
 </body>
 </html>

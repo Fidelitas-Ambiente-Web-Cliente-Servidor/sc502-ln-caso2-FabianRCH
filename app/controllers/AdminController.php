@@ -25,38 +25,53 @@ class AdminController
         }
         require __DIR__ . '/../views/admin/solicitudes.php';
     }
-    
-    // Aprobar solicitud
+
+    public function getSolicitudesJson()
+    {
+        if (!isset($_SESSION['id']) || $_SESSION['rol'] !== 'admin') {
+            header('Content-Type: application/json');
+            echo json_encode([]);
+            return;
+        }
+
+        $solicitudes = $this->solicitudModel->getPendientes();
+        header('Content-Type: application/json');
+        echo json_encode($solicitudes);
+    }
+
     public function aprobar()
     {
         if (!isset($_SESSION['id']) || $_SESSION['rol'] !== 'admin') {
-            echo json_encode(['success' => false, 'error' => 'No autorizado']);
+            echo json_encode(['success' => false, 'error' => 'No admin']);
             return;
         }
-        
+
         $solicitudId = $_POST['id_solicitud'] ?? 0;
-        
-        try {
-            
+
+        $solicitud = $this->solicitudModel->getById($solicitudId);
+
+        if ($this->solicitudModel->aprobar($solicitudId)) {
+            $this->tallerModel->descontarCupo($solicitud['taller_id']);
             echo json_encode(['success' => true]);
-            
-        } catch (Exception $e) {
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'No se pudo aprobar']);
         }
     }
+
     public function rechazar()
     {
         if (!isset($_SESSION['id']) || $_SESSION['rol'] !== 'admin') {
-            echo json_encode(['success' => false, 'error' => 'No autorizado']);
+            echo json_encode(['success' => false, 'error' => 'No admin']);
             return;
         }
-        
+
         $solicitudId = $_POST['id_solicitud'] ?? 0;
-        
+
         if ($this->solicitudModel->rechazar($solicitudId)) {
             echo json_encode(['success' => true]);
         } else {
-            echo json_encode(['success' => false, 'error' => 'Error al rechazar']);
+            echo json_encode(['success' => false, 'error' => 'No se pudo rechazar']);
         }
     }
+
 }
